@@ -12,12 +12,16 @@ chrome.contextMenus.onClicked.addListener(function (obj) {
     file: 'content.js'
   });
   const notId = 'start' + Math.random();
-  chrome.notifications.create(notId, {
+  const c = chrome.notifications.create(notId, {
     type: 'basic',
     title: 'Started tracking changed in this tab',
     message: '',
     iconUrl: chrome.extension.getURL('icon.png'),
   });
+  c.onclick = () => {
+    window.focs()
+    this.close();
+  }
 });
 
 const notificationTab = {};
