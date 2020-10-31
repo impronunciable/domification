@@ -1,3 +1,3 @@
-# Marcos extension 😂
+# Domification
 
-Track changes in a specific tab and get a notification when something happens
+Chrome extension that track changes in a specific tab and get a notification when something happens

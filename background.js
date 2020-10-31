@@ -1,6 +1,6 @@
-const id = 'marcos-menu';
+const id = 'domification-menu';
 
-chrome.contextMenus.create({title: 'Observe page changs', id: id}, function() {
+chrome.contextMenus.create({title: 'Domification - Observe tab changes', id: id}, function() {
   if (chrome.extension.lastError) {
     console.log('Got expected error: ' + chrome.extension.lastError.message);
     }
@@ -40,4 +40,5 @@ chrome.runtime.onMessage.addListener(function(request, sender) {
 chrome.notifications.onClicked.addListener(function callback(notificationId) {
   var updateProperties = { 'active': true };
   chrome.tabs.update(notificationTab[notificationId], updateProperties);
+  chrome.notifications.clear(notificationId);
 });
