@@ -1,0 +1,23 @@
+{
+  "name": "Marcos",
+  "version": "1.0",
+  "description": "HTML changes monitoring",
+  "manifest_version": 2,
+  "permissions": [
+    "activeTab",
+    "contextMenus",
+    "notifications",
+    "tabs",
+    "chrome://favicon/"
+  ],
+  "content_security_policy": "script-src 'self'; object-src 'self'; img-src chrome://favicon/;",
+  "background": {
+    "persistent": false,
+    "scripts": ["background.js"]
+    },    
+"icons": {
+  "16": "icon.png",
+  "38": "icon.png",
+  "48": "icon.png"
+}
+}
