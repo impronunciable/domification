@@ -1,6 +1,6 @@
 const id = 'domification-menu';
 
-chrome.contextMenus.create({title: 'Domification - Observe tab changes', id: id}, function() {
+chrome.contextMenus.create({title: 'Domification - Toggle observe tab changes', id: id}, function() {
   if (chrome.extension.lastError) {
     console.log('Got expected error: ' + chrome.extension.lastError.message);
     }
@@ -12,16 +12,12 @@ chrome.contextMenus.onClicked.addListener(function (obj) {
     file: 'content.js'
   });
   const notId = 'start' + Math.random();
-  const c = chrome.notifications.create(notId, {
+  chrome.notifications.create(notId, {
     type: 'basic',
     title: 'Started tracking changed in this tab',
     message: '',
     iconUrl: chrome.extension.getURL('icon.png'),
   });
-  c.onclick = () => {
-    window.focs()
-    this.close();
-  }
 });
 
 const notificationTab = {};
@@ -45,4 +41,5 @@ chrome.notifications.onClicked.addListener(function callback(notificationId) {
   var updateProperties = { 'active': true };
   chrome.tabs.update(notificationTab[notificationId], updateProperties);
   chrome.notifications.clear(notificationId);
+  window.focs();
 });
