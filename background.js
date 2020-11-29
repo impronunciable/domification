@@ -1,27 +1,4 @@
-const id = 'domification-menu';
-
-chrome.contextMenus.create({title: 'Domification - Toggle observe tab changes', id: id}, function() {
-  if (chrome.extension.lastError) {
-    console.log('Got expected error: ' + chrome.extension.lastError.message);
-    }
-});
-
-chrome.contextMenus.onClicked.addListener(function (obj) {
-  if (obj.menuItemId !== id) return;
-  chrome.tabs.executeScript({
-    file: 'content.js'
-  });
-  const notId = 'start' + Math.random();
-  chrome.notifications.create(notId, {
-    type: 'basic',
-    title: 'Started tracking changed in this tab',
-    message: '',
-    iconUrl: chrome.extension.getURL('icon.png'),
-  });
-});
-
 const notificationTab = {};
-
 
 chrome.runtime.onMessage.addListener(function(request, sender) {
   console.log(sender)
