@@ -44,9 +44,15 @@ var selectFunc = function (e) {
   targetElem = e.srcElement;
   observer = new MutationObserver(function() {
     chrome.runtime.sendMessage({ type: 'notification', element: targetElem });
+
+    // Disconnect the observer temporarily so we can set the class name
+    // to avoid triggering and endless loop.
+    observer.disconnect();
     targetElem.classList.add(ELEMENT_CHANGED_CLASSNAME);
+    observer.observe(targetElem, { childList: true, subtree: true, characterData: true, attributes: true });
+
   });
-  observer.observe(targetElem, { childList: true, subtree: true, characterData: true });
+  observer.observe(targetElem, { childList: true, subtree: true, characterData: true, attributes: true });
 
 }
 
