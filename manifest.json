@@ -11,13 +11,31 @@
     "chrome://favicon/"
   ],
   "content_security_policy": "script-src 'self'; object-src 'self'; img-src chrome://favicon/;",
+  "commands": {
+    "toggle": {
+      "description": "Activate extension",
+      "suggested_key": {
+        "default": "Alt+A",
+        "mac": "Command+A"
+      }
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*/*","http://*/*"],
+      "css": ["core.css"],
+      "js": ["core.js"],
+      "run_at": "document_end",
+      "all_frames": true
+    }
+  ],
   "background": {
     "persistent": false,
     "scripts": ["background.js"]
-    },    
-"icons": {
-  "16": "icon.png",
-  "38": "icon.png",
-  "48": "icon.png"
-}
+  },
+  "icons": {
+    "16": "icon.png",
+    "38": "icon.png",
+    "48": "icon.png"
+  }
 }

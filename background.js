@@ -37,9 +37,19 @@ chrome.runtime.onMessage.addListener(function(request, sender) {
   }
 });
 
+chrome.commands.onCommand.addListener(function (command) {
+  switch (command) {
+    case 'toggle':
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+        chrome.tabs.sendMessage(tabs[0].id, { type: 'toggle' });
+      });
+      break;
+  }
+});
+
 chrome.notifications.onClicked.addListener(function callback(notificationId) {
   var updateProperties = { 'active': true };
   chrome.tabs.update(notificationTab[notificationId], updateProperties);
   chrome.notifications.clear(notificationId);
-  window.focs();
+  window.focus();
 });
