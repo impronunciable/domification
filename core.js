@@ -3,7 +3,7 @@ const MOUSE_VISITED_CLASSNAME = 'crx_mouse_visited';
 const ELEMENT_CHANGED_CLASSNAME = 'elm_changed';
 
 let enabled = false;
-let observer, targetElem;
+let observer, targetElem, DOMObserver;
 
 // Previous dom, that we want to track, so we can remove the previous styling.
 var prevDOM = null;
@@ -32,16 +32,19 @@ var selectFunc = function (e) {
   // Don't perform the default action on the element.
   e.preventDefault();
 
-  // After selecting the elemtn, disable the extension.
+  // After selecting the element, disable the extension.
   removeListeners();
   enabled = false;
+
   // Only 1 observer supported to start.
   if (observer) {
     observer.disconnect();
+    DOMObserver.disconnect();
     targetElem.classList.remove(ELEMENT_CHANGED_CLASSNAME);
   }
 
   targetElem = e.srcElement;
+
   observer = new MutationObserver(function() {
     chrome.runtime.sendMessage({ type: 'notification', element: targetElem });
 
@@ -52,7 +55,20 @@ var selectFunc = function (e) {
     observer.observe(targetElem, { childList: true, subtree: true, characterData: true, attributes: true });
 
   });
+
   observer.observe(targetElem, { childList: true, subtree: true, characterData: true, attributes: true });
+
+  DOMObserver = new MutationObserver(function(mutations) {
+    for (const m of mutations) {
+      if (m.removedNodes.length > 0) {
+        // The target element has been removed, notify about it
+        if (!document.body.contains(targetElem)) {
+          chrome.runtime.sendMessage({ type: 'notification', element: targetElem });
+        }
+      }
+    }
+  });
+  DOMObserver.observe(document.body, { childList: true, subtree: true });
 
 }
 
@@ -75,6 +91,7 @@ chrome.runtime.onMessage.addListener(function(request) {
     // Remove any previous observers listeners if there are any;
     if (observer) {
       observer.disconnect();
+      DOMObserver.disconnect();
       targetElem.classList.remove(ELEMENT_CHANGED_CLASSNAME);
     }
     if (enabled) {
