@@ -4,5 +4,9 @@
 }
 
 .elm_changed {
-  background-color: red !important;
+  border: medium dashed red !important;
+}
+
+.deleted-nav {
+  /*position: fixed;*/
 }
