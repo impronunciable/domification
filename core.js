@@ -4,13 +4,17 @@ const ELEMENT_CHANGED_CLASSNAME = 'elm_changed';
 
 let enabled = false;
 let observer, targetElem, DOMObserver;
+let targetParents = [];
 
 // Previous dom, that we want to track, so we can remove the previous styling.
 var prevDOM = null;
 
+var deletedElementsComponent = document.createElement('div');
+deletedElementsComponent.classList.add('deleted-nav');
+
 // Highlights the DOM element when the mouse moves
 var highlightFunc = function (e) {
-  var srcElement = e.srcElement;
+    var srcElement = e.srcElement;
 
     // For NPE checking, we check safely. We need to remove the class name
     // Since we will be styling the new one after.
@@ -24,6 +28,21 @@ var highlightFunc = function (e) {
     // The current element is now the previous. So we can remove the class
     // during the next iteration.
     prevDOM = srcElement;
+}
+
+
+// getTargetParents stores the selected element hierarchy
+// so it can be compared later to highlight the last existing
+// parent.
+var getTargetParents = function(element) {
+  let p = [];
+  let parent = element.parentElement;
+  while(parent) {
+    p.push(parent);
+    parent = parent.parentElement;
+  }
+
+  return p
 }
 
 // Whenever the user clicks something, create an observer that will
@@ -44,6 +63,7 @@ var selectFunc = function (e) {
   }
 
   targetElem = e.srcElement;
+  targetParents = getTargetParents(e.srcElement);
 
   observer = new MutationObserver(function() {
     chrome.runtime.sendMessage({ type: 'notification', element: targetElem });
@@ -60,10 +80,28 @@ var selectFunc = function (e) {
 
   DOMObserver = new MutationObserver(function(mutations) {
     for (const m of mutations) {
+      // A removal happened in the DOM, let's
+      // check if our element was removed.
       if (m.removedNodes.length > 0) {
-        // The target element has been removed, notify about it
+
         if (!document.body.contains(targetElem)) {
+
           chrome.runtime.sendMessage({ type: 'notification', element: targetElem });
+
+          // Disconnect the DOM observer otherwise we'll get notified
+          // for each change on the DOM.
+          DOMObserver.disconnect()
+
+
+          // Traverse up the target parents until we find the first element
+          // that hasn't been removed and highlight it.
+
+          for (let p of targetParents) {
+            if(document.body.contains(p)) {
+              p.classList.add(ELEMENT_CHANGED_CLASSNAME);
+              break;
+            }
+          }
         }
       }
     }
